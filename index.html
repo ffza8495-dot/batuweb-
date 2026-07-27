@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATU ✦ Tails World</title>
+    
+    <!-- ====== خطوط بكسل ====== -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================================================================
+           ROOT VARIABLES - ألوان تايلز
+           ================================================================ */
+        :root {
+            --tails-orange-dark: #E67E22;
+            --tails-orange-light: #F39C12;
+            --tails-gold: #F1C40F;
+            --tails-blue: #3498DB;
+            --tails-blue-dark: #1A252F;
+            --tails-white: #FDFEFE;
+            --tails-cream: #FFF8E7;
+            --tails-red: #E74C3C;
+            --tails-green: #2ECC71;
+            --tails-pink: #F8C8D8;
+            --tails-purple: #9B59B6;
+            
+            --pixel-shadow: #0a0a1a;
+            --pixel-border: #2b2d42;
+        }
+
+        /* ================================================================
+           GLOBAL RESET
+           ================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--tails-blue-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--tails-white);
+        }
+
+        /* ================================================================
+           CANVAS الخلفية (العالم الثاني)
+           ================================================================ */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ================================================================
+           تايلز في الزوايا
+           ================================================================ */
+        .tails-corner {
+            position: fixed;
+            z-index: 5;
+            pointer-events: none;
+            filter: drop-shadow(0 0 20px rgba(241, 196, 15, 0.3));
+        }
+
+        /* تايلز ① - الزاوية اليمين العليا */
+        .tails-top-right {
+            top: 30px;
+            right: 30px;
+            width: 130px;
+            animation: flyRight 4s ease-in-out infinite;
+        }
+
+        /* تايلز ② - الزاوية اليمين السفلى (معكوس) */
+        .tails-bottom-right {
+            bottom: 30px;
+            right: 30px;
+            width: 75px;
+            transform: scaleX(-1);
+            animation: floatPulse 3s ease-in-out infinite;
+        }
+
+        /* تايلز ③ - الزاوية اليسار السفلى */
+        .tails-bottom-left {
+            bottom: 30px;
+            left: 30px;
+            width: 95px;
+            animation: flyLeft 4.5s ease-in-out infinite;
+        }
+
+        /* ================================================================
+           حركات تايلز
+           ================================================================ */
+        @keyframes flyRight {
+            0% { transform: translateY(0) rotate(-4deg); }
+            50% { transform: translateY(-25px) rotate(4deg) scale(1.02); }
+            100% { transform: translateY(0) rotate(-4deg); }
+        }
+
+        @keyframes flyLeft {
+            0% { transform: translateX(0) translateY(0) rotate(4deg); }
+            50% { transform: translateX(-20px) translateY(-20px) rotate(-4deg) scale(1.03); }
+            100% { transform: translateX(0) translateY(0) rotate(4deg); }
+        }
+
+        @keyframes floatPulse {
+            0% { transform: scaleX(-1) translateY(0) scale(1); }
+            50% { transform: scaleX(-1) translateY(-12px) scale(1.05); }
+            100% { transform: scaleX(-1) translateY(0) scale(1); }
+        }
+
+        /* ================================================================
+           البطاقة الرئيسية
+           ================================================================ */
+        .app-card {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(26, 37, 47, 0.92);
+            border: 4px solid var(--tails-gold);
+            box-shadow: 
+                0 0 40px rgba(241, 196, 15, 0.15),
+                8px 8px 0 var(--pixel-shadow),
+                12px 12px 0 rgba(0,0,0,0.3);
+            padding: 30px 24px 40px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+        }
+
+        /* ================================================================
+           الاسم الرئيسي (BATU)
+           ================================================================ */
+        .name-section {
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+        }
+
+        .name-section h1 {
+            font-size: 3.2rem;
+            color: var(--tails-gold);
+            text-shadow: 
+                0 0 30px rgba(241, 196, 15, 0.3),
+                4px 4px 0 var(--pixel-shadow),
+                -2px -2px 0 var(--tails-orange-dark);
+            letter-spacing: 4px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .name-section h1::before {
+            content: '✦';
+            color: var(--tails-orange-light);
+            font-size: 2rem;
+            margin-left: 15px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        .name-section h1::after {
+            content: '✦';
+            color: var(--tails-orange-light);
+            font-size: 2rem;
+            margin-right: 15px;
+            animation: sparkle 2s ease-in-out infinite 1s;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+        }
+
+        .name-section .subtitle {
+            font-size: 0.6rem;
+            color: var(--tails-blue);
+            margin-top: 8px;
+            letter-spacing: 3px;
+            opacity: 0.8;
+        }
+
+        /* ================================================================
+           الخانات (Cards)
+           ================================================================ */
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid var(--tails-orange-dark);
+            padding: 14px 18px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--tails-gold), 
+                transparent, 
+                var(--tails-orange-light), 
+                transparent);
+            z-index: -1;
+            opacity: 0.1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(241, 196, 15, 0.15);
+        }
+
+        .info-card .label {
+            font-size: 0.55rem;
+            color: var(--tails-gold);
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+
+        .info-card .value {
+            font-size: 0.85rem;
+            color: var(--tails-white);
+            letter-spacing: 1px;
+            word-break: break-word;
+        }
+
+        .info-card .value .highlight {
+            color: var(--tails-gold);
+        }
+
+        /* ================================================================
+           الهوايات (Hobby)
+           ================================================================ */
+        .hobby-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .hobby-item {
+            background: rgba(241, 196, 15, 0.08);
+            border: 2px solid var(--tails-orange-dark);
+            padding: 10px 8px;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            transition: all 0.3s;
+            color: var(--tails-white);
+        }
+
+        .hobby-item:hover {
+            background: rgba(241, 196, 15, 0.2);
+            transform: scale(1.03);
+            border-color: var(--tails-gold);
+        }
+
+        .hobby-item .icon {
+            display: block;
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        /* ================================================================
+           رسالة السلام
+           ================================================================ */
+        .peace-message {
+            text-align: center;
+            padding: 16px 10px;
+            background: rgba(46, 204, 113, 0.08);
+            border: 2px solid var(--tails-green);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .peace-message::after {
+            content: '🕊️';
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.05;
+            top: -10px;
+            right: -10px;
+            transform: rotate(15deg);
+        }
+
+        .peace-message .text {
+            font-size: 0.75rem;
+            color: var(--tails-green);
+            letter-spacing: 2px;
+            line-height: 1.8;
+            text-shadow: 0 0 20px rgba(46, 204, 113, 0.2);
+        }
+
+        .peace-message .text .heart {
+            color: var(--tails-red);
+            animation: heartBeat 1.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* ================================================================
+           الفوتر
+           ================================================================ */
+        .footer {
+            text-align: center;
+            font-size: 0.45rem;
+            color: var(--tails-blue);
+            opacity: 0.6;
+            padding-top: 10px;
+            border-top: 2px dashed rgba(241, 196, 15, 0.2);
+            letter-spacing: 2px;
+        }
+
+        .footer .tails-icon {
+            display: inline-block;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* ================================================================
+           زر تشغيل/إيقاف الموسيقى
+           ================================================================ */
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: rgba(26, 37, 47, 0.9);
+            border: 3px solid var(--tails-gold);
+            color: var(--tails-gold);
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            backdrop-filter: blur(4px);
+        }
+
+        .music-control:hover {
+            background: var(--tails-gold);
+            color: var(--tails-blue-dark);
+            box-shadow: 0 0 30px rgba(241, 196, 15, 0.3);
+        }
+
+        /* ================================================================
+           RESPONSIVE
+           ================================================================ */
+        @media (max-width: 600px) {
+            .name-section h1 {
+                font-size: 2.2rem;
+            }
+            .name-section h1::before,
+            .name-section h1::after {
+                font-size: 1.2rem;
+            }
+            .tails-top-right { width: 80px; top: 15px; right: 15px; }
+            .tails-bottom-right { width: 55px; bottom: 15px; right: 15px; }
+            .tails-bottom-left { width: 65px; bottom: 15px; left: 15px; }
+            .app-card { padding: 20px 16px 30px; }
+            .info-card .value { font-size: 0.7rem; }
+            .hobby-item { font-size: 0.5rem; padding: 8px 6px; }
+            .peace-message .text { font-size: 0.6rem; }
+        }
+
+        @media (max-width: 400px) {
+            .name-section h1 { font-size: 1.6rem; }
+            .tails-top-right { width: 60px; top: 10px; right: 10px; }
+            .tails-bottom-right { width: 45px; bottom: 10px; right: 10px; }
+            .tails-bottom-left { width: 50px; bottom: 10px; left: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================================================================
+    CANVAS الخلفية (العالم الثاني)
+    ================================================================ -->
+    <canvas id="background-canvas"></canvas>
+
+    <!-- ================================================================
+    تايلز في الزوايا (صورة واحدة مكررة)
+    ================================================================ -->
+    <img src="tails.png" alt="Tails" class="tails-corner tails-top-right">
+    <img src="tails.png" alt="Tails" class="tails-corner tails-bottom-right">
+    <img src="tails.png" alt="Tails" class="tails-corner tails-bottom-left">
+
+    <!-- ================================================================
+    البطاقة الرئيسية
+    ================================================================ -->
+    <div class="app-card">
+
+        <!-- ===== الاسم ===== -->
+        <div class="name-section">
+            <h1>BATU</h1>
+            <div class="subtitle">✦ PIXEL WORLD ✦</div>
+        </div>
+
+        <!-- ===== العمر ===== -->
+        <div class="info-card">
+            <div class="label">✦ AGE</div>
+            <div class="value">18 <span style="color: var(--tails-gold);">✦</span> YEARS</div>
+        </div>
+
+        <!-- ===== تيك توك ===== -->
+        <div class="info-card">
+            <div class="label">✦ TIKTOK</div>
+            <div class="value">@<span class="highlight">n7o9t</span></div>
+        </div>
+
+        <!-- ===== ديسكورد ===== -->
+        <div class="info-card">
+            <div class="label">✦ DISCORD</div>
+            <div class="value"><span class="highlight">n7o9e</span></div>
+        </div>
+
+        <!-- ===== الشخصية المفضلة ===== -->
+        <div class="info-card">
+            <div class="label">✦ FAVORITE CHARACTER</div>
+            <div class="value" style="font-size: 1rem;">
+                🦊 <span class="highlight">TAILS</span>
+                <span style="font-size: 0.6rem; color: var(--tails-blue); display: block; margin-top: 2px;">
+                    ✦ THE TWO-TAILED FOX ✦
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== الهوايات ===== -->
+        <div class="info-card">
+            <div class="label">✦ HOBBIES</div>
+            <div class="hobby-grid">
+                <div class="hobby-item">
+                    <span class="icon">🎨</span>
+                    DRAWING
+                </div>
+                <div class="hobby-item">
+                    <span class="icon">💻</span>
+                    PROGRAMMING
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== رسالة السلام ===== -->
+        <div class="peace-message">
+            <div class="text">
+                ✧ PEACE SHOULD BE <br>
+                FOR <span class="heart">❤️</span> EVERYONE ✧
+                <br>
+                <span style="font-size: 0.5rem; opacity: 0.5; display: block; margin-top: 6px;">
+                    🕊️ 🌍 ✨
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== الفوتر ===== -->
+        <div class="footer">
+            <span class="tails-icon">🦊</span>
+            ✦ MADE WITH <span style="color: var(--tails-red);">❤️</span> BY BATU ✦
+            <br>
+            <span style="font-size: 0.4rem; opacity: 0.5;">✦ 2026 ✦ ALL RIGHTS RESERVED ✦</span>
+        </div>
+
+    </div>
+
+    <!-- ================================================================
+    زر التحكم بالموسيقى
+    ================================================================ -->
+    <button class="music-control" id="musicToggle">🔊 MUSIC ON</button>
+
+    <!-- ================================================================
+    JAVASCRIPT - العالم الخلفي + الجسيمات + الموسيقى
+    ================================================================ -->
+    <script>
+        /* ================================================================
+          1. نظام الصوت (8-bit Generator)
+          ================================================================ */
+        let audioCtx = null;
+        let isMusicPlaying = false;
+        let musicInterval = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        function playPixelNote(freq, type = 'sine', duration = 0.15, volume = 0.08) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = initAudio();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                gain.gain.setValueAtTime(volume, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // ===== تشغيل الموسيقى الخلفية (لحن 8-bit هادئ) =====
+        function startBackgroundMusic() {
+            if (musicInterval) return;
+
+            // سلم موسيقي هادئ (مقام تايلز)
+            const notes = [
+                { freq: 523, dur: 0.25 }, // C5
+                { freq: 587, dur: 0.25 }, // D5
+                { freq: 659, dur: 0.25 }, // E5
+                { freq: 784, dur: 0.35 }, // G5
+                { freq: 659, dur: 0.25 }, // E5
+                { freq: 587, dur: 0.25 }, // D5
+                { freq: 523, dur: 0.35 }, // C5
+            ];
+
+            let index = 0;
+            let isMelody = true;
+
+            musicInterval = setInterval(() => {
+                if (!soundEnabled) return;
+
+                const note = notes[index % notes.length];
+                const type = isMelody ? 'sine' : 'triangle';
+                const vol = isMelody ? 0.06 : 0.03;
+
+                playPixelNote(note.freq, type, note.dur, vol);
+
+                index++;
+
+                // كل 16 نote نغير النمط
+                if (index % 16 === 0) {
+                    isMelody = !isMelody;
+                }
+            }, 280);
+
+            isMusicPlaying = true;
+        }
+
+        function stopBackgroundMusic() {
+            if (musicInterval) {
+                clearInterval(musicInterval);
+                musicInterval = null;
+            }
+            isMusicPlaying = false;
+        }
+
+        // ===== زر تشغيل/إيقاف الموسيقى =====
+        document.getElementById('musicToggle').addEventListener('click', function() {
+            if (isMusicPlaying) {
+                stopBackgroundMusic();
+                this.textContent = '🔇 MUSIC OFF';
+                this.style.borderColor = '#E74C3C';
+                this.style.color = '#E74C3C';
+            } else {
+                initAudio();
+                startBackgroundMusic();
+                this.textContent = '🔊 MUSIC ON';
+                this.style.borderColor = '#F1C40F';
+                this.style.color = '#F1C40F';
+            }
+        });
+
+        // بدء الموسيقى تلقائياً عند أول تفاعل
+        document.addEventListener('click', () => {
+            if (!isMusicPlaying && !musicInterval) {
+                initAudio();
+                startBackgroundMusic();
+                document.getElementById('musicToggle').textContent = '🔊 MUSIC ON';
+            }
+        }, { once: true });
+
+        /* ================================================================
+          2. نظام الخلفية (العالم الثاني)
+          ================================================================ */
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let W, H;
+
+        function resizeCanvas() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // ===== 2.1 نظام الجسيمات المتقدم =====
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.size = Math.random() * 4 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.6 + 0.2;
+                this.type = Math.random() > 0.6 ? 'star' : 'ring';
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+                this.pulse = Math.random() * Math.PI * 2;
+                this.pulseSpeed = Math.random() * 0.02 + 0.01;
+                this.color = this.getColor();
+            }
+
+            getColor() {
+                const colors = [
+                    '#F1C40F', // ذهبي
+                    '#F39C12', // برتقالي
+                    '#3498DB', // أزرق
+                    '#E67E22', // برتقالي غامق
+                    '#2ECC71', // أخضر
+                    '#9B59B6', // بنفسجي
+                    '#E74C3C', // أحمر
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.rotation += this.rotationSpeed;
+                this.pulse += this.pulseSpeed;
+
+                // عودة عند الخروج
+                if (this.x < -20) this.x = W + 20;
+                if (this.x > W + 20) this.x = -20;
+                if (this.y < -20) this.y = H + 20;
+                if (this.y > H + 20) this.y = -20;
+
+                // تغيير الاتجاه بشكل عشوائي
+                if (Math.random() < 0.001) {
+                    this.speedX += (Math.random() - 0.5) * 0.2;
+                    this.speedY += (Math.random() - 0.5) * 0.2;
+                    // تحديد السرعة القصوى
+                    const maxSpeed = 0.8;
+                    const mag = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+                    if (mag > maxSpeed) {
+                        this.speedX = (this.speedX / mag) * maxSpeed;
+                        this.speedY = (this.speedY / mag) * maxSpeed;
+                    }
+                }
+            }
+
+            draw() {
+                const scale = 0.7 + 0.3 * Math.sin(this.pulse);
+                const size = this.size * scale;
+                const alpha = this.opacity * (0.7 + 0.3 * Math.sin(this.pulse * 0.7));
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = alpha;
+
+                if (this.type === 'star') {
+                    // رسم نجمة
+                    this.drawStar(size);
+                } else {
+                    // رسم حلقة سونيك
+                    this.drawRing(size);
+                }
+
+                ctx.restore();
+            }
+
+            drawStar(size) {
+                const points = 5;
+                const outer = size * 1.2;
+                const inner = size * 0.5;
+
+                ctx.beginPath();
+                for (let i = 0; i < points * 2; i++) {
+                    const radius = i % 2 === 0 ? outer : inner;
+                    const angle = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+            }
+
+            drawRing(size) {
+                // حلقة سونيك
+                const outerR = size * 1.2;
+                const innerR = size * 0.6;
+
+                ctx.beginPath();
+                ctx.arc(0, 0, outerR, 0, Math.PI * 2);
+                ctx.arc(0, 0, innerR, 0, Math.PI * 2, true);
+                ctx.closePath();
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // بريق
+                ctx.beginPath();
+                ctx.arc(-outerR * 0.3, -outerR * 0.3, size * 0.2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.fill();
+            }
+        }
+
+        // ===== 2.2 نظام السحب =====
+        class Cloud {
+            constructor() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H * 0.6 + 20;
+                this.width = Math.random() * 120 + 60;
+                this.height = Math.random() * 30 + 15;
+                this.speed = Math.random() * 0.3 + 0.1;
+                this.opacity = Math.random() * 0.15 + 0.05;
+                this.pixels = [];
+                this.generatePixels();
+            }
+
+            generatePixels() {
+                const count = Math.floor(this.width * this.height / 80);
+                for (let i = 0; i < count; i++) {
+                    this.pixels.push({
+                        x: (Math.random() - 0.5) * this.width * 0.8,
+                        y: (Math.random() - 0.5) * this.height * 0.8,
+                        size: Math.random() * 6 + 3,
+                    });
+                }
+            }
+
+            update() {
+                this.x += this.speed;
+                if (this.x > W + this.width) {
+                    this.x = -this.width;
+                    this.y = Math.random() * H * 0.6 + 20;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+
+                this.pixels.forEach(p => {
+                    const px = this.x + p.x;
+                    const py = this.y + p.y;
+                    ctx.fillRect(px, py, p.size, p.size);
+                });
+
+                ctx.restore();
+            }
+        }
+
+        // ===== 2.3 نظام العشب والنباتات =====
+        class GrassBlade {
+            constructor() {
+                this.x = Math.random() * W;
+                this.y = H - Math.random() * 80 - 20;
+                this.height = Math.random() * 20 + 10;
+                this.width = Math.random() * 4 + 2;
+                this.color = Math.random() > 0.5 ? '#2ECC71' : '#27AE60';
+                this.swayOffset = Math.random() * Math.PI * 2;
+                this.swaySpeed = Math.random() * 0.02 + 0.01;
+            }
+
+            update() {
+                this.swayOffset += this.swaySpeed;
+                // إعادة تدوير
+                if (this.y > H + 10) {
+                    this.x = Math.random() * W;
+                    this.y = H - Math.random() * 80 - 20;
+                }
+            }
+
+            draw() {
+                const sway = Math.sin(this.swayOffset) * 3;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x + sway, this.y, this.width, this.height);
+                // قمة
+                ctx.fillRect(this.x + sway - 1, this.y - 2, this.width + 2, 3);
+            }
+        }
+
+        // ===== 2.4 نظام الزهور =====
+        class Flower {
+            constructor() {
+                this.x = Math.random() * W;
+                this.y = H - Math.random() * 60 - 30;
+                this.size = Math.random() * 6 + 4;
+                this.color = ['#F8C8D8', '#FF6B6B', '#F1C40F', '#9B59B6', '#3498DB'][Math.floor(Math.random() * 5)];
+                this.pulse = Math.random() * Math.PI * 2;
+                this.pulseSpeed = Math.random() * 0.02 + 0.01;
+            }
+
+            update() {
+                this.pulse += this.pulseSpeed;
+                if (this.y > H + 10) {
+                    this.x = Math.random() * W;
+                    this.y = H - Math.random() * 60 - 30;
+                }
+            }
+
+            draw() {
+                const scale = 0.8 + 0.2 * Math.sin(this.pulse);
+                const s = this.size * scale;
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                // ساق
+                ctx.fillStyle = '#27AE60';
+                ctx.fillRect(-1, 0, 2, s * 1.5);
+
+                // بتلات
+                const petalCount = 5;
+                for (let i = 0; i < petalCount; i++) {
+                    const angle = (i / petalCount) * Math.PI * 2 + this.pulse * 0.1;
+                    const px = Math.cos(angle) * s;
+                    const py = Math.sin(angle) * s;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(px - s * 0.3, py - s * 0.3, s * 0.6, s * 0.6);
+                }
+
+                // مركز
+                ctx.fillStyle = '#F1C40F';
+                ctx.fillRect(-s * 0.2, -s * 0.2, s * 0.4, s * 0.4);
+
+                ctx.restore();
+            }
+        }
+
+        // ===== إنشاء الكائنات =====
+        const particles = [];
+        const clouds = [];
+        const grassBlades = [];
+        const flowers = [];
+
+        // جسيمات
+        for (let i = 0; i < 60; i++) {
+            particles.push(new Particle());
+        }
+
+        // سحب
+        for (let i = 0; i < 6; i++) {
+            clouds.push(new Cloud());
+        }
+
+        // عشب
+        for (let i = 0; i < 80; i++) {
+            grassBlades.push(new GrassBlade());
+        }
+
+        // زهور
+        for (let i = 0; i < 20; i++) {
+            flowers.push(new Flower());
+        }
+
+        // ===== حلقة الرسم =====
+        function drawBackground() {
+            ctx.clearRect(0, 0, W, H);
+
+            // تدرج السماء
+            const gradient = ctx.createLinearGradient(0, 0, 0, H);
+            gradient.addColorStop(0, '#1A252F');
+            gradient.addColorStop(0.4, '#2C3E50');
+            gradient.addColorStop(0.7, '#4A6A7A');
+            gradient.addColorStop(1, '#1A252F');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, W, H);
+
+            // نجوم خلفية ثابتة
+            ctx.fillStyle = 'rgba(255,255,255,0.1)';
+            for (let i = 0; i < 100; i++) {
+                const x = (i * 137.5 + 42) % W;
+                const y = (i * 97.3 + 13) % (H * 0.6);
+                const s = ((i * 31) % 3) + 1;
+                ctx.fillRect(x, y, s, s);
+            }
+
+            // ===== رسم السحب =====
+            clouds.forEach(cloud => {
+                cloud.update();
+                cloud.draw();
+            });
+
+            // ===== رسم العشب =====
+            grassBlades.forEach(grass => {
+                grass.update();
+                grass.draw();
+            });
+
+            // ===== رسم الزهور =====
+            flowers.forEach(flower => {
+                flower.update();
+                flower.draw();
+            });
+
+            // ===== رسم الجسيمات =====
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            // ===== تأثير توهج في الأسفل =====
+            const glow = ctx.createRadialGradient(W/2, H, 50, W/2, H, 300);
+            glow.addColorStop(0, 'rgba(241, 196, 15, 0.03)');
+            glow.addColorStop(1, 'rgba(241, 196, 15, 0)');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, W, H);
